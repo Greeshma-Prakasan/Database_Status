@@ -1,5 +1,4 @@
-import mysql.connector as mysql
-from rich import console
+import MySQLdb as mysql
 from rich.console import Console
 
 console = Console()
@@ -7,22 +6,22 @@ console = Console()
 db = mysql.connect(
   host='localhost',
   user='root',
-  password='root'
+  password='root',
+  db='INFORMATION_SCHEMA'
 )
 
 cur = db.cursor()
-cur.execute('SHOW STATUS')
-res = cur.fetchall()
-r = dict(res)
-
 
 def get_info_of_db():
-	console.print(f"Uptime, {r['Uptime']}\nThreads_created, {r['Threads_created']}\nThreads_connected, {r['Threads_connected']}\nThreads_running, {r['Threads_running']}\nQueries, {r['Queries']}\nMax_used_connections, {r['Max_used_connections']}", style='bold blue')
+    cur.execute('SHOW STATUS')
+    res = cur.fetchall()
+    r = dict(res)
+    console.print(f"\tUptime, {r['Uptime']}\n\tThreads_created, {r['Threads_created']}\n\tThreads_connected, {r['Threads_connected']}\n\tThreads_running, {r['Threads_running']}\n\tQueries, {r['Queries']}\n\tMax_used_connections, {r['Max_used_connections']}", style='bold blue')
 	
 def get_process_list():
 	cur.execute("select ID,DB from PROCESSLIST") 
 	res = cur.fetchall()
-	console.print(res)
+	console.print(f"\t{res}")
 
 
 	
@@ -39,6 +38,5 @@ while True:
     elif ch == 2:
         get_process_list()
     else:
+        cur.close()
         break
-
-cur.close()
